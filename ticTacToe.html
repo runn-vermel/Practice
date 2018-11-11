@@ -16,8 +16,8 @@
         text-align: center;
     }
     .container {
-        width: 600px;
-        height: 600px;
+        width: 350px;
+        height: 350px;
 
 
     }
@@ -57,7 +57,7 @@
         eventListener (event) {
             const x = event.target.getAttribute('x');
             const y = event.target.getAttribute('y');
-
+            if (this.grid[x][y].length) return false;
             this.setText(event.target);
             this.setGridPosition({x,y});
             this.changeActivePlayer();
@@ -148,8 +148,16 @@
             }
             if (!this.isWinner) this.checkRowsForWinner(tempRow)
         }
+        isGameOver () {
+            let over = true;
+            this.grid.forEach(row=> {
+                if (row.some(entry=> !entry.length)) over = false
+            });
+            if (over) {
+                alert('nobody won :(')
+            }
+        }
         isThereAWinner () {
-            
             if (!this.isWinner) this.checkHorizontal();
             //check vertical lines second
             if (!this.isWinner) this.checkVertical();
@@ -158,6 +166,8 @@
             if (!this.isWinner) this.firstDiagonal();
             //check Diagonal second
             if (!this.isWinner) this.secondDiagonal();
+            
+            if (!this.isWinner) this.isGameOver();
         }
     }
 
