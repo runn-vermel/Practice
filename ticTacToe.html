@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <title>Document</title>
+    <style>
+    span {
+        display: inline-block;
+        width: 100px;
+        height:100px;
+        background:orange;
+        margin:8px;
+        font-size: 90px;
+        text-align: center;
+    }
+    .container {
+        width: 600px;
+        height: 600px;
+
+
+    }
+    .row {
+        display: flex;
+        flex-direction: row;
+    }
+    .x {background: red;}
+    .o {background: green;}
+    
+    </style>
+</head>
+<body>
+    
+</body>
+</html>
+
+<script>
+    class TicTacToe {
+        constructor(tileNumber) {
+            this.grid = [];
+            this.tileNumber = tileNumber;
+            this.XPLAYER = "X";
+            this.OPLAYER = "O";
+            this.activePlayer = this.XPLAYER;
+            this.isWinner = false;
+            this.buildBoard(this.tileNumber);
+        }
+        setGridPosition ({x,y}) {
+            this.grid[x][y] = this.activePlayer
+        }
+        setText (target) {
+            event.target.innerHTML = (this.activePlayer === this.XPLAYER)
+                ? "X"
+                : "O";
+        }
+        eventListener (event) {
+            const x = event.target.getAttribute('x');
+            const y = event.target.getAttribute('y');
+
+            this.setText(event.target);
+            this.setGridPosition({x,y});
+            this.changeActivePlayer();
+            setTimeout(() => this.isThereAWinner(),50);
+              
+        }
+        addEventListener (container) {
+            container.addEventListener('click', this.eventListener.bind(this), false)
+        }
+        buildBoard (tileNumber) {
+            let div, 
+            span, 
+            container = document.createElement('div');
+
+            container.classList = "container";
+            this.addEventListener(container);
+
+            for (let i = 0; i< tileNumber;i++) {
+                div = document.createElement('div');
+                div.classList = "row";
+                this.grid[i] = [];
+                for (let j=0;j<tileNumber;j++) {
+                    span = document.createElement('span');
+                    span.setAttribute('x', i);
+                    span.setAttribute('y', j);
+                    div.appendChild(span); 
+                    this.grid[i][j]='';
+                }
+                container.appendChild(div);
+            }
+            document.body.appendChild(container);
+        }
+        
+        changeActivePlayer() {
+            this.activePlayer = this.activePlayer === this.XPLAYER ? this.OPLAYER : this.XPLAYER;
+        } 
+        winner (player) {
+            alert(`Player ${player} is the winner!`)
+        }
+        removeEventListener() {
+            const container = document.querySelector('.container')
+            container.removeEventListener('click', this.eventListener.bind(this), false)
+        }
+        checkRowsForWinner (tempRow) {
+            if (tempRow.length && tempRow.every(entry=>entry && entry === "X")) {
+                this.isWinner = true;
+                this.winner("X");
+                this.removeEventListener();
+            } else if (tempRow.length && tempRow.every(entry=>entry && entry === "O")) {
+                this.isWinner = true;    
+                this.winner("O");
+                this.removeEventListener();
+            }
+            
+        }
+        checkHorizontal () {
+            //check horizontal rows first
+            this.grid.forEach((row)=> {
+                if (!this.isWinner ) this.checkRowsForWinner(row);
+            });
+        }
+        checkVertical () {
+            let tempRow = [];
+            for (let i=0;i<this.tileNumber;i++) {
+                let j =0;
+                while (tempRow.length<this.tileNumber) {
+                    tempRow.push(this.grid[j][i]);
+                    j++;
+                }
+                
+                if (!this.isWinner ) this.checkRowsForWinner(tempRow)
+                tempRow = [];
+            }
+        }
+        firstDiagonal () {
+            const tempRow = [];
+            for (let i=0;i<this.tileNumber;i++) {
+                tempRow.push(this.grid[i][i])
+            }
+            if (!this.isWinner) this.checkRowsForWinner(tempRow)
+        }
+        secondDiagonal () {
+            const tempRow = [];
+            let counter = this.tileNumber-1;
+            for (let i=0;i<this.tileNumber;i++) { 
+                tempRow.push(this.grid[i][counter])
+                counter--;
+            }
+            if (!this.isWinner) this.checkRowsForWinner(tempRow)
+        }
+        isThereAWinner () {
+            
+            if (!this.isWinner) this.checkHorizontal();
+            //check vertical lines second
+            if (!this.isWinner) this.checkVertical();
+            
+            //check Diagonal first
+            if (!this.isWinner) this.firstDiagonal();
+            //check Diagonal second
+            if (!this.isWinner) this.secondDiagonal();
+        }
+    }
+
+new TicTacToe(3);
+
+</script>
